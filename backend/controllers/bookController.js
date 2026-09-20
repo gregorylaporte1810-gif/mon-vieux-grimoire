@@ -16,6 +16,7 @@ exports.getOneBook = (req, res, next) => {
 };
 
 // Créer un livre
+// Créer un livre
 exports.createBook = (req, res, next) => {
   try {
     const bookObject = JSON.parse(req.body.book);
@@ -23,12 +24,32 @@ exports.createBook = (req, res, next) => {
     delete bookObject._id;
     delete bookObject.userId;
 
+    const initialRating = Number(bookObject.ratings?.[0]?.grade ?? 0);
+
+    if (
+      !Number.isInteger(initialRating) ||
+      initialRating < 0 ||
+      initialRating > 5
+    ) {
+      return res.status(400).json({
+        message: "La note doit être comprise entre 0 et 5",
+      });
+    }
+
+    delete bookObject.ratings;
+    delete bookObject.averageRating;
+
     const book = new Book({
       ...bookObject,
       userId: req.auth.userId,
       imageUrl: `${req.protocol}://${req.get("host")}/images/${req.file.filename}`,
-      ratings: [],
-      averageRating: 0,
+      ratings: [
+        {
+          userId: req.auth.userId,
+          grade: initialRating,
+        },
+      ],
+      averageRating: initialRating,
     });
 
     book
