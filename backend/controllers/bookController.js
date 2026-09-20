@@ -113,3 +113,51 @@ exports.deleteBook = (req, res, next) => {
     })
     .catch((error) => res.status(400).json({ error }));
 };
+
+exports.rateBook = async (req, res, next) => {
+  try {
+    const rating = Number(req.body.rating);
+    const userId = req.auth.userId;
+
+    if (!Number.isInteger(rating) || rating < 0 || rating > 5) {
+      return res.status(400).json({
+        message: "La note doit être comprise entre 0 et 5",
+      });
+    }
+
+    const book = await Book.findOne({ _id: req.params.id });
+
+    if (!book) {
+      return res.status(404).json({
+        message: "Livre introuvable",
+      });
+    }
+
+    const alreadyRated = book.ratings.some((item) => item.userId === userId);
+
+    if (alreadyRated) {
+      return res.status(400).json({
+        message: "Vous avez déjà noté ce livre",
+      });
+    }
+
+    book.ratings.push({
+      userId,
+      grade: rating,
+    });
+
+    const total = book.ratings.reduce((sum, item) => sum + item.grade, 0);
+
+    book.averageRating = total / book.ratings.length;
+
+    const updatedBook = await book.save();
+
+    return res.status(200).json(updatedBook);
+  } catch (error) {
+    console.error("Erreur notation :", error);
+
+    return res.status(500).json({
+      message: "Erreur lors de l'ajout de la note",
+    });
+  }
+};
