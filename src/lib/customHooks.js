@@ -21,13 +21,14 @@ export function useUser() {
 }
 
 export function useBestRatedBooks() {
-  const [bestRatedBooks, setBestRatedBooks] = useState({});
+  const [bestRatedBooks, setBestRatedBooks] = useState([]);
 
   useEffect(() => {
     async function getRatedBooks() {
       const books = await getBestRatedBooks();
       setBestRatedBooks(books);
     }
+
     getRatedBooks();
   }, []);
 
