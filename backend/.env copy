@@ -1,0 +1,3 @@
+MONGO_URI=mongodb+srv://gregorylaporte1810_db_user:4dZnpTaV0vSnn4Zb@cluster0.xatkcjl.mongodb.net/mon-vieux-grimoire?retryWrites=true&w=majority&appName=Cluster0
+
+JWT_SECRET=mayline-Gregory-leo-malya-et-joker-a-deviner
